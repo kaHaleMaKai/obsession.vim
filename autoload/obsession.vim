@@ -97,7 +97,7 @@ fun! obsession#is_empty_view() abort "{{{
 endfun "}}}
 
 
-fun! obsession#store_session_allowed(dir) abort "{{{
+fun! obsession#is_allowed(dir) abort "{{{
   return get(g:, 'obsession_auto_save', v:true)
         \ || obsession#exists(a:dir)
 endfun "}}}

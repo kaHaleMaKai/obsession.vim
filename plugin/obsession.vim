@@ -38,6 +38,16 @@ fun! s:restore_session() abort "{{{
 endfun "}}}
 
 
+fun! s:store_if_allowed() abort "{{{
+  if !obsession#is_allowed(s:work_dir)
+    return
+  elseif obsession#is_empty_view() || obsession#is_git_related()
+    return
+  endif
+  call obsession#save_session_by_dir(s:work_dir)
+endfun "}}}
+
+
 fun! s:safely_init_autogroups() abort "{{{
   if s:obsession_initialized
     return
@@ -45,8 +55,8 @@ fun! s:safely_init_autogroups() abort "{{{
 
   augroup obsession_save_progress
     au!
-    au BufEnter * call obsession#save_session_by_dir_if_allowed(s:work_dir)
-    au VimLeave * call obsession#save_session_by_dir_if_allowed(s:work_dir)
+    au BufEnter * call s:store_if_allowed()
+    au VimLeavePre * call s:store_if_allowed()
   augroup END
 
   let s:obsession_initialized = v:true
@@ -78,7 +88,7 @@ fun! s:init() abort "{{{
   if obsession#exists(s:work_dir) && obsession#ack(s:work_dir)
     call obsession#restore_session_by_dir_if_exists(s:work_dir)
     call s:safely_init_autogroups()
-  elseif obsession#store_session_allowed(s:work_dir)
+  elseif obsession#is_allowed(s:work_dir)
     call s:safely_init_autogroups()
   endif
   call s:init_commands()
