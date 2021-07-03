@@ -8,12 +8,11 @@ let s:default_exclusion_dirs = [$HOME, '/tmp']
 let exclusion_dirs = get(g:, 'obsession_exlusion_dirs', s:default_exclusion_dirs)
 if index(exclusion_dirs, getcwd()) > -1
   finish
-elseif exists('*Obsession_exclusion_fn') && Obsession_exclusion_fn(getcwd())
+elseif has_key(g:obsession_opts, 'exclusion_fn') && g:obsession_opts.exclusion_fn(getcwd())
   finish
 endif
 
 let s:work_dir = getcwd()
-
 
 fun! s:uninitialize() abort "{{{
   call obsession#remove_session_file(s:work_dir)
@@ -29,7 +28,7 @@ endfun "}}}
 
 
 fun! s:save_session() abort "{{{
-  call obsession#save_session_by_dir(s:work_dir)
+  call obsession#save_session_by_dir(s:work_dir, g:obsession_opts)
   call s:safely_init_autogroups()
 endfun "}}}
 
@@ -46,7 +45,7 @@ fun! s:store_if_allowed() abort "{{{
   elseif obsession#is_empty_view() || obsession#is_git_related()
     return
   endif
-  call obsession#save_session_by_dir(s:work_dir)
+  call obsession#save_session_by_dir(s:work_dir, g:obsession_opts)
 endfun "}}}
 
 

@@ -41,7 +41,7 @@ fun! obsession#get_session_file(dir) abort "{{{
 endfun "}}}
 
 
-fun! obsession#save_session_by_dir(dir) abort "{{{
+fun! obsession#save_session_by_dir(dir, ...) abort "{{{
   if obsession#is_empty_view()
     return
   endif
@@ -50,14 +50,12 @@ fun! obsession#save_session_by_dir(dir) abort "{{{
     call mkdir(s:session_dir, 'p')
   endif
   exe printf('mksession! %s', session_file)
-  let content = readfile(session_file)
-  for i in range(0, len(content) - 1)
-    let line = content[i]
-    if line =~ 'if exists(.s:wipebuf.) && getbufvar(s:wipebuf, ..buftype.) isnot# .terminal.'
-      call remove(content, i, i + 2)
-      break
-    endif
-  endfor
+  let original_content = readfile(session_file)
+  if has_key(get(a:000, 0, {}), 'content_filter_fn')
+    let content = a:1.content_filter_fn(original_content)
+  else
+    let content = original_content
+  endif
   call writefile(content, session_file)
 endfun "}}}
 
