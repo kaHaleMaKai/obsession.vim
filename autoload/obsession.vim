@@ -4,7 +4,13 @@ endif
 let g:obsession_loaded = v:true
 
 
-let s:default_session_dir = path#join($HOME, '.cache', 'vim', 'obsession.vim')
+if exists('$XDG_CACHE_DIR')
+  let cache_dir = $XDG_CACHE_DIR
+else
+  let cache_dir = path#join($HOME, '.cache')
+endif
+
+let s:default_session_dir = path#join(cache_dir, 'vim', 'obsession.vim')
 let s:session_dir = get(g:, 'session_dir', s:default_session_dir)
 let s:work_dir = getcwd()
 
