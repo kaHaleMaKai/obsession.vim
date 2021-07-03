@@ -44,14 +44,15 @@ fun! obsession#save_session_by_dir(dir) abort "{{{
     call mkdir(s:session_dir, 'p')
   endif
   exe printf('mksession! %s', session_file)
-endfun "}}}
-
-
-fun! obsession#save_session_by_dir_if_allowed(dir) abort "{{{
-  if !obsession#store_session_allowed(a:dir)
-    return
-  endif
-  return obsession#save_session_by_dir(a:dir)
+  let content = readfile(session_file)
+  for i in range(0, len(content) - 1)
+    let line = content[i]
+    if line =~ 'if exists(.s:wipebuf.) && getbufvar(s:wipebuf, ..buftype.) isnot# .terminal.'
+      call remove(content, i, i + 2)
+      break
+    endif
+  endfor
+  call writefile(content, session_file)
 endfun "}}}
 
 
