@@ -8,6 +8,8 @@ let s:default_exclusion_dirs = [$HOME, '/tmp']
 let exclusion_dirs = get(g:, 'obsession_exlusion_dirs', s:default_exclusion_dirs)
 if index(exclusion_dirs, getcwd()) > -1
   finish
+elseif exists('*Obsession_exclusion_fn') && Obsession_exclusion_fn(getcwd())
+  finish
 endif
 
 let s:work_dir = getcwd()
