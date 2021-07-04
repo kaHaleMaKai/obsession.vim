@@ -32,13 +32,13 @@ fun! obsession#get_session_dir() abort "{{{
 endfun "}}}
 
 
-fun! obsession#get_dir_hash(dir) abort "{{{
+fun! obsession#get_hash(dir) abort "{{{
   return split(systemlist(['md5sum'], a:dir)[0])[0]
 endfun "}}}
 
 
 fun! obsession#get_session_file(dir) abort "{{{
-  let dir_hash = obsession#get_dir_hash(a:dir)
+  let dir_hash = obsession#get_hash(a:dir)
   return path#join(s:session_dir, dir_hash)
 endfun "}}}
 
@@ -49,7 +49,7 @@ fun! obsession#save_session_by_dir(dir, ...) abort "{{{
   endif
   let session_file = obsession#get_session_file(a:dir)
   if !filewritable(s:session_dir)
-    call mkdir(s:session_dir, 'p')
+    call mkdir(s:session_dir, 'p', 0700)
   endif
   exe printf('mksession! %s', session_file)
   let original_content = readfile(session_file)
@@ -107,4 +107,28 @@ endfun "}}}
 fun! obsession#is_allowed(dir) abort "{{{
   return get(g:, 'obsession_auto_save', v:true)
         \ || obsession#exists(a:dir)
+endfun "}}}
+
+
+fun! obsession#get_undo_file(dir) abort "{{{
+  let hash = obsession#get_hash(a:dir)
+  return path#join(s:undo_dir, hash)
+endfun "}}}
+
+
+fun! obsession#save_undo_history(dir) abort "{{{
+  let undo_file = obsession#get_undo_file(a:dir)
+  if !filewritable(s:undo_dir)
+    call mkdir(s:undo_dir, 'p', 0700)
+  endif
+  exe printf('wundo! %s', undo_file)
+endfun "}}}
+
+
+fun! obsession#read_undo_history(dir) abort "{{{
+  let undo_file = obsession#get_undo_file(a:dir)
+  if !filereadable(undo_file)
+    return
+  endif
+  silent! exe printf('rundo %s', undo_file)
 endfun "}}}

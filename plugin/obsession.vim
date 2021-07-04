@@ -30,12 +30,14 @@ endfun "}}}
 fun! s:save_session() abort "{{{
   call obsession#save_session_by_dir(s:work_dir, g:obsession_opts)
   call s:safely_init_autogroups()
+  call obsession#save_undo_history(s:work_dir))
 endfun "}}}
 
 
 fun! s:restore_session() abort "{{{
   call s:safely_init_autogroups()
   call obsession#restore_session_by_dir_if_exists(s:work_dir)
+  call obsession#read_undo_history(s:work_dir)
 endfun "}}}
 
 
@@ -58,6 +60,7 @@ fun! s:safely_init_autogroups() abort "{{{
     au!
     au BufEnter * call s:store_if_allowed()
     au VimLeavePre * call s:store_if_allowed()
+    au BufWritePost * call obsession#save_undo_history(s:work_dir)
   augroup END
 
   let s:obsession_initialized = v:true
@@ -88,6 +91,7 @@ fun! s:init() abort "{{{
   endif
   if obsession#exists(s:work_dir) && obsession#ack(s:work_dir)
     call obsession#restore_session_by_dir_if_exists(s:work_dir)
+    call obsession#read_undo_history(s:work_dir)
     call s:safely_init_autogroups()
   elseif obsession#is_allowed(s:work_dir)
     call s:safely_init_autogroups()
