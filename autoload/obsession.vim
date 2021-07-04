@@ -10,8 +10,10 @@ else
   let cache_dir = path#join($HOME, '.cache')
 endif
 
-let s:default_session_dir = path#join(cache_dir, 'vim', 'obsession.vim')
-let s:session_dir = get(g:, 'session_dir', s:default_session_dir)
+let s:default_obsession_dir = path#join(cache_dir, 'vim', 'obsession.vim')
+let s:obsession_base_dir = get(g:, 'obsession_dir', s:default_obsession_dir)
+let s:session_dir = path#join(s:obsession_base_dir, 'sessions')
+let s:undo_dir = path#join(s:obsession_base_dir, 'undo')
 let s:work_dir = getcwd()
 
 
