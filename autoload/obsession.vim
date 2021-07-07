@@ -94,8 +94,8 @@ endfun "}}}
 
 
 fun! obsession#is_git_related() abort "{{{
- let dir = expand('%:p:h')
- return dir =~# '/\.git/' && s:get_num_buffers() == 1
+ let dir = expand('%:p')
+ return dir =~# '/\.git\(/\|$\)' && s:get_num_buffers() == 1
 endfun "}}}
 
 
