@@ -56,11 +56,18 @@ fun! s:safely_init_autogroups() abort "{{{
     return
   endif
 
+  if v:vim_did_enter
+    call s:post_startup()
+  endif
+
   augroup obsession_save_progress
     au!
     au BufEnter * call s:store_if_allowed()
     au VimLeavePre * call s:store_if_allowed()
     au BufWritePost * call obsession#save_undo_history(s:work_dir)
+    if !v:vim_did_enter
+      au VimEnter * call s:post_startup()
+    endif
   augroup END
 
   let s:obsession_initialized = v:true
@@ -82,6 +89,16 @@ fun! s:init_commands() abort "{{{
         \ -nargs=0
         \ Obload
         \ call <sid>restore_session()
+endfun "}}}
+
+
+fun! s:post_startup() abort "{{{
+  for buffer in getbufinfo()
+    let bnr = buffer.bufnr
+    let bft = getbufvar(bnr, "&ft")
+    call setbufvar(bnr, "&ft", bft)
+  endfor
+  doautocmd User ObsessionInitPost
 endfun "}}}
 
 
