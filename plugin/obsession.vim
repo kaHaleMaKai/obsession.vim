@@ -103,7 +103,7 @@ endfun "}}}
 
 
 fun! s:init() abort "{{{
-  if obsession#is_git_related()
+  if obsession#started_with_args() || obsession#is_git_related()
     return
   endif
   if obsession#exists(s:work_dir) && obsession#ack(s:work_dir)

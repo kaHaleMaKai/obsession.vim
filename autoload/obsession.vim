@@ -132,3 +132,11 @@ fun! obsession#read_undo_history(dir) abort "{{{
   endif
   silent! exe printf('rundo %s', undo_file)
 endfun "}}}
+
+
+" TODO check if we have options or files that should actually
+" prevent a session from being loaded instead of
+" merely checking whether args are present.
+fun! obsession#started_with_args() abort "{{{
+  return !empty(argv())
+endfun "}}}
