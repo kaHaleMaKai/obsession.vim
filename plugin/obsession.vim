@@ -30,7 +30,7 @@ endfun "}}}
 fun! s:save_session() abort "{{{
   call obsession#save_session_by_dir(s:work_dir, g:obsession_opts)
   call s:safely_init_autogroups()
-  call obsession#save_undo_history(s:work_dir))
+  call obsession#save_undo_history(s:work_dir)
 endfun "}}}
 
 
