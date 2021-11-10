@@ -44,7 +44,7 @@ endfun "}}}
 fun! s:store_if_allowed() abort "{{{
   if !obsession#is_allowed(s:work_dir)
     return
-  elseif obsession#is_empty_view() || obsession#is_git_related()
+  elseif obsession#is_empty_view() || obsession#is_git_related() || obsession#is_nerd_tree()
     return
   endif
   call obsession#save_session_by_dir(s:work_dir, g:obsession_opts)

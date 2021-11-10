@@ -52,7 +52,28 @@ fun! obsession#save_session_by_dir(dir, ...) abort "{{{
     call mkdir(s:session_dir, 'p', 0700)
   endif
   exe printf('mksession! %s', session_file)
-  let original_content = readfile(session_file)
+  let original_content = []
+  for line in readfile(session_file)
+    if line =~# '^let &g:so = s:so_save'
+      call extend(original_content, [
+            \ '" close empty, unnamed windows',
+            \ 'let wins = []',
+            \ 'for win in nvim_list_wins()',
+            \ '  let buf = nvim_win_get_buf(win)',
+            \ '  let name = nvim_buf_get_name(buf)',
+            \ '  call add(wins, {"win": win, "buf": buf, "name": name})',
+            \ 'endfor',
+            \ 'for win in wins',
+            \ '  if empty(win.name)',
+            \ '    call nvim_win_close(win.win, v:false)',
+            \ '    call nvim_buf_delete(win.buf, {})',
+            \ '  endif',
+            \ 'endfor',
+            \ 'unlet wins'
+            \ ])
+    endif
+    call add(original_content, line)
+  endfor
   if has_key(get(a:000, 0, {}), 'content_filter_fn')
     let content = a:1.content_filter_fn(original_content)
   else
@@ -90,6 +111,11 @@ endfun "}}}
 
 fun! obsession#exists(dir) abort "{{{
   return filewritable(obsession#get_session_file(a:dir)) == 1
+endfun "}}}
+
+
+fun! obsession#is_nerd_tree() abort "{{{
+  return exists('b:NERDTree')
 endfun "}}}
 
 
